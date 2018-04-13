@@ -1,1 +1,5 @@
 [base]
+name=Local Repository
+baseurl=file:///media/
+enabled=1
+gpgcheck=0
