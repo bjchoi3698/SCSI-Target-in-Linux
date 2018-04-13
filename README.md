@@ -112,7 +112,7 @@ List Active targets:
 
 Create a new target device:
 ```
-# tgtadm --lld iscsi --mode target --op new --tid=1 --targetname iqn.2018-04.io.local:[hostname].all
+# tgtadm --lld iscsi --mode target --op new --tid=1 --targetname iqn.2018-04.io.local:iscsi-box.all
 ```
 
 Add a logical unit (LUN):
