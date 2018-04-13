@@ -42,37 +42,6 @@ SELINUX=disabled
 
 ESC:wq!
 
-# vi /etc/sysconfig/network-scripts/ifcfg-eth0
-...
-ONBOOT=yes
-NM_CONTROLLED=no
-BOOTPROTO=static
-IPADDR=192.168.
-PREFIX=24
-
-ESC:wq!
-```
-
-Post-Configuration (SCSI-target-utils QuickStart Guide)
-Installation
-Start by installing the __scsi-target-utils__ package
-```
-# yum -y install scsi-target-utils
-```
-Configuration
-1. Initial preparation (Network)
-```
-# vi /etc/sysconfig/network
-HOSTNAME=
-DNS=
-GATEWAY=
-
-ESC:wq!
-
-# vi /etc/sysconfig/selinux
-SELINUS=disabled
-
-ESC:wq!
 
 # vi /etc/sysconfig/network-script/ifcfg-eth0
 ONBOOT=yes
@@ -84,14 +53,22 @@ PREFIX=24 (if it is in class-C)
 ESC:wq!
 ```
 
-2. Firewall
+Post-Configuration (SCSI-target-utils QuickStart Guide)
+Installation
+Start by installing the __scsi-target-utils__ package
+```
+# yum -y install scsi-target-utils
+```
+Configuration
+
+1. Firewall
 Either stop/disable or reconfigure. For the simple practice, stop.
 ```Firewall
 # service iptables stop
 # chkconfig --del iptables
 # chkconfig --level 2345 iptables off
 ```
-3. Service (tgtd) startup
+2. Service (tgtd) startup
 ```Service tgtd startup
 # service tgtd start
 # chkconfig tgtd on
@@ -115,7 +92,7 @@ Check /etc/tgt/target.conf
 ESC:wq!
 ```
 
-4. Add iSCSI disk
+3. Add iSCSI disk
 Add phyiscal disk or add a block device
 * (VirtualBox/VMware), add a disk in iSCSI Controller
 * A block device
@@ -123,7 +100,7 @@ Add phyiscal disk or add a block device
 # dd if=/dev/zero of=/var/tmp/iscsi-disk1 bs=1M count=8000  (8GB file)
 ```
 
-5. Up and running
+4. Up and running
 * Create a target device
 * Add a logical unit
 * Enable the target to accept initiator
@@ -144,7 +121,7 @@ Add a logical unit (LUN):
 ```
 Repeat creation and addition for all disks (increasing tid and lun)
 
-6. Permissions (if needed)
+5. Permissions (if needed)
 To display a list of all configured user accunts,
 ```
 # tgtadm --lld iscsi --mode acount --op show
