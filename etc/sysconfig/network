@@ -1,1 +1,5 @@
-
+#
+NETWORKING=yes
+HOSTNAME=iscsi-box.local.io
+DNS=
+GATEWAY=
