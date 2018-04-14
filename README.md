@@ -1,7 +1,6 @@
-# SCSI-Target-in-Linux
-Install Linux
+# iSCSI-Target-in-Linux
 
-Set up 'YUM'. Use Linux Installation Media (RedHat/Oracle Linux)
+Set up 'YUM' locally without internet access. Use Linux Installation Media (RedHat/Oracle Linux)
 ```YUM Setup
 # mount /dev/sr0 /media
 mount:block device /dev/sr0 is write-protected, mounting read-only
@@ -61,44 +60,33 @@ Start by installing the __scsi-target-utils__ package
 ```
 Configuration
 
-1. Firewall
-Either stop/disable or reconfigure. For the simple practice, stop.
+1. Start __tgtd__ service and enable at boot
+```Start tgtd
+# service tgtd start
+# chkconfig tgtd on
+
+# chkconfig --list tgtd
+```
+
+2. Firewall
+For easy practice, no firewall.
 ```Firewall
 # service iptables stop
 # chkconfig --del iptables
 # chkconfig --level 2345 iptables off
 ```
-2. Service (tgtd) startup
-```Service tgtd startup
-# service tgtd start
-# chkconfig tgtd on
-```
-Check /etc/tgt/target.conf
+3. Edit /etc/tgt/target.conf. Add the following lines for/dev/sdb and /dev/sdc
 ```/etc/tgt/targets.conf
-# Similar to the one above, but we fetch vendor_id, product_id, product_rev and
-# scsi_sn from the disks.
-# Vendor identification (vendor_id) is replaced in all disks by "MyVendor"
-
-#<target iqn.2008-09.com.example:server.target4>
-#
-<target iqn.2018-04.io.local:[hostname].all>
-    direct-store /dev/sdb	# Becomes LUN 1
-    direct-store /dev/sdc	# Becomes LUN 2
-    direct-store /dev/sdd	# Becomes LUN 3
-#    write-cache off
-    vendor_id Vendor Inc.
+...
+<target iqn:2018-04.local.ovm3:ovm3-box.target1>
+	backing-store	/dev/sdb
+	backing-store	/dev/sdc
 </target>
 
 ESC:wq!
 ```
 
-3. Add iSCSI disk
-Add phyiscal disk or add a block device
-* (VirtualBox/VMware), add a disk in iSCSI Controller
-* A block device
-``` Block device
-# dd if=/dev/zero of=/var/tmp/iscsi-disk1 bs=1M count=8000  (8GB file)
-```
+
 
 4. Up and running
 * Create a target device
