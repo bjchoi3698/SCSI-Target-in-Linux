@@ -1,21 +1,17 @@
 # iSCSI-Target-in-Linux
 
-Set up 'YUM' locally without internet access. Use Linux Installation Media (RedHat/Oracle Linux)
+0. Set up 'YUM' locally without internet access. Use Linux Installation Media (RedHat compatibles)
 ```YUM Setup
 # mount /dev/sr0 /media
 mount:block device /dev/sr0 is write-protected, mounting read-only
+
 # vi /etc/yum.repos.d/local.repo
 [base]
 name=Local Repository
-baseurl=file:///media/
+baseurl=file:///media/ . (file:// - protocol, the 3rd (/) is the directory location, /media)
 enabled=1
 gpgcheck=0
 ```
-/dev/sr0: Linux Installation media is attached to vm
-file:///media/
-*file:// - protocol*
-
-*/ - actual location in this case, /media is the directory has all RPMs. Interpret as /media/*
 
 Remove all other \*.repo files under /etc/yum.repo.d/ directory.
 ```
@@ -25,7 +21,7 @@ Cleaning repos: base
 Cleaning up Everything
 # yum repolist
 ```
-
+Optional steps in case no network configured.
 Set hostname/IP address
 ```
 # vi /etc/sysconfig/network
@@ -52,84 +48,87 @@ PREFIX=24 (if it is in class-C)
 ESC:wq!
 ```
 
-Post-Configuration (SCSI-target-utils QuickStart Guide)
-Installation
+1. Prepare Disk or Logical Volume
+It will be varied for your situation. Assume that there are two disks (/dev/sdb and /dev/sdc) available for this practice.
+
+2. Installation
 Start by installing the __scsi-target-utils__ package
 ```
 # yum -y install scsi-target-utils
 ```
-Configuration
 
-1. Start __tgtd__ service and enable at boot
+3. Start __tgtd__ service and enable at boot
 ```Start tgtd
 # service tgtd start
-# chkconfig tgtd on
+# chkconfig tgtd on     (Enable tgtd service at boot)
 
 # chkconfig --list tgtd
 ```
 
-2. Firewall
-For easy practice, no firewall.
+4. Turn off Firewall (Simple practice no worries security_)
+For simple practice, no firewall.
 ```Firewall
 # service iptables stop
 # chkconfig --del iptables
 # chkconfig --level 2345 iptables off
 ```
-3. Edit /etc/tgt/target.conf. Add the following lines for/dev/sdb and /dev/sdc
-```/etc/tgt/targets.conf
-...
+5. Edit /etc/tgt/target.conf. Add the following lines for/dev/sdb and /dev/sdc
+At the end of "targets.conf", add the following (assume we have two disks, /dev/sdb and /dev/sdc)
+```
 <target iqn:2018-04.local.ovm3:ovm3-box.target1>
 	backing-store	/dev/sdb
 	backing-store	/dev/sdc
 </target>
-
-ESC:wq!
 ```
 
-
-
-4. Up and running
-* Create a target device
-* Add a logical unit
-* Enable the target to accept initiator
-
-List Active targets:
+6. Reload __tgtd__ and verify
 ```
-# tgtadm --lld iscsi --mode target --op show
-```
+# service tgtd reload
 
-Create a new target device:
+# tgtadm --mode target --op show
+Target 1: iqn:2018-04.local.ovm3:ovm3-box.target1
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags:
+        LUN: 1
+            Type: disk
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            Size: 107374 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            Backing store type: rdwr
+            Backing store path: /dev/sdb
+            Backing store flags:
+        LUN: 2
+            Type: disk
+            SCSI ID: IET     00010002
+            SCSI SN: beaf12
+            Size: 26399 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            Backing store type: rdwr
+            Backing store path: /dev/sdc
+            Backing store flags:
+    Account information:
+    ACL information:
+        ALL
 ```
-# tgtadm --lld iscsi --mode target --op new --tid=1 --targetname iqn.2018-04.io.local:iscsi-box.all
-```
-
-Add a logical unit (LUN):
-```
-% tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 -b /dev/sdb (or /var/tmp/iscsi-disk1)
-```
-Repeat creation and addition for all disks (increasing tid and lun)
-
-5. Permissions (if needed)
-To display a list of all configured user accunts,
-```
-# tgtadm --lld iscsi --mode acount --op show
-```
-
-All IP wildcard to allow all initiators
-```
-# tgtadm --lld iscsi --mode target --op bind --tid 1 -I ALL
-```
-
-IP-based restrictions (If you already accepted ALL initiators, remove)
-```
-# tgtadm --lld iscsi --mode target --op unbind --tid 1 -I ALL
-
-# tgtadm --ld iscsi --mode target --op bind --tid 1 -I 10.10.0.201
-
-or subnet
-# tgtadm --lld iscsi --mode target --op bind --tid 1 -I 10.0.0.0/24
-```
-
-
-
-
