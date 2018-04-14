@@ -8,7 +8,7 @@ mount:block device /dev/sr0 is write-protected, mounting read-only
 # vi /etc/yum.repos.d/local.repo
 [base]
 name=Local Repository
-baseurl=file:///media/ . (file:// - protocol, the 3rd (/) is the directory location, /media)
+baseurl=file:///media/    # file:// - protocol, the 3rd (/) is the directory location, /media
 enabled=1
 gpgcheck=0
 ```
