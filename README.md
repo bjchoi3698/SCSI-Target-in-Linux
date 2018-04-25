@@ -1,7 +1,7 @@
 # iSCSI-Target-in-Linux
 
 0. Set up 'YUM' locally without internet access. Use Linux Installation Media (RedHat compatibles)
-```YUM Setup
+```console
 # mount /dev/sr0 /media
 mount:block device /dev/sr0 is write-protected, mounting read-only
 
@@ -14,7 +14,7 @@ gpgcheck=0
 ```
 
 Remove all other \*.repo files under /etc/yum.repo.d/ directory.
-```
+```shell
 # yum clean all   (# clean local database for yum usage)
 Loaded plugins: ulninfo
 Cleaning repos: base
