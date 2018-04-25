@@ -14,7 +14,7 @@ gpgcheck=0
 ```
 
 Remove all other \*.repo files under /etc/yum.repo.d/ directory.
-```shell
+```console
 # yum clean all   (# clean local database for yum usage)
 Loaded plugins: ulninfo
 Cleaning repos: base
@@ -82,7 +82,7 @@ At the end of "targets.conf", add the following (assume we have two disks, /dev/
 ```
 
 6. Reload __tgtd__ and verify
-```
+```console
 # service tgtd reload
 
 # tgtadm --mode target --op show
